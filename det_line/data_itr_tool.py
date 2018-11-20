@@ -1,9 +1,26 @@
 '''
 实现一个类，对于山脊线标注数据、山脊线的canny检测数据进行patch的输出
+边缘局部patch输出已经废弃
+改为大型局部patch输出，是为了组成batch
+
 已有的全部函数方式实现的重写、搬运、改造
 
 另一种，混合图像局部组成一个“图像”，这个在像素级别的领域似乎是混合多样性的方法，避免batch限制
+有些文章中训练使用这样的方式，大数据而小batch
 但是上下文就有影响了
+尚未实现
+
+
+核心是文件名生成器
+利用文件名生成器，遍历所有图像以及标注，并作为生成器不断给出局部图像
+
+可见这其实就是tf.data的实现思路，最终趋同了
+
+使用这个生成器能够对接tf.data的from_generator
+
+TODO：
+计划实现自己的多进程（python进程），依托名称生成器，将图像数据的读取、解码、局部的裁切任务进行分散
+
 '''
 import cv2,os,fnmatch,random,math
 import numpy as np
@@ -312,6 +329,7 @@ class ridge_data(object):
             yield patch ,lable, pos
         raise GeneratorExit('this image tranversed')
     def _rotate_bound(self, image, angle):
+        # tf中似乎没有轻微的旋转
         # 保留中心、保留边缘自动调整大小的旋转 
         #
         # 角度制
