@@ -771,7 +771,8 @@ def parse_function(filename, label):
 def train_preprocess(image, label):
     '''
     #训练预处理
-    #随机调整亮度、饱和，随机水平翻转'''
+    #随机调整亮度、饱和，随机水平翻转
+    '''
     image = tf.image.random_flip_left_right(image)
 
     image = tf.image.random_brightness(image, max_delta=32.0 / 255.0)
